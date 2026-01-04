@@ -180,15 +180,37 @@ ProxyChat = {
         console.log(`Twitch Anti-Ban: ${message}`);
     },
 
+    clearElement: function (element) {
+        if (!element) return;
+        const bttvSettingsRaw = localStorage.getItem('bttv_settings');
+        const bttvSettings = bttvSettingsRaw ? JSON.parse(bttvSettingsRaw) : {};
+        const deletedMessagesMode = bttvSettings.deletedMessages || 0;
+
+        switch (deletedMessagesMode) {
+            case 0:
+            case 1:
+                element.remove();
+                break;
+            case 2:
+                element.classList.add('bttv-chat-line-deleted');
+                break;
+            case 3:
+                element.classList.add('bttv-chat-line-deleted', 'bttv-highlighted');
+                break;
+        }
+    },
+
     clearMessage: function (messageId) {
-        setTimeout(function () {
-            $(`.chat-line[data-id=${messageId}]`).remove();
+        setTimeout(() => {
+            const msg = $(`.chat-line[data-id="${messageId}"]`);
+            this.clearElement(msg[0]);
         }, 100);
     },
 
     clearAllMessages: function (userId) {
-        setTimeout(function () {
-            $(`.chat-line[data-user-id=${userId}]`).remove();
+        setTimeout(() => {
+            const msgs = $(`.chat-line[data-user-id="${userId}"]`);
+            msgs.each((_, msg) => this.clearElement(msg));
         }, 100);
     },
 
